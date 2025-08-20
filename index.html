@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tasador Inmobiliario Lima & Callao - Cuneo 2025</title>
+  <meta name="description" content="Calculadora de valorización inmobiliaria para Lima y Callao. Obtén estimaciones precisas basadas en datos actualizados del mercado 2025.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Estilos básicos para compatibilidad */
+    .alert {
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .alert-error {
+      background-color: #fee;
+      border: 1px solid #fcc;
+      color: #c33;
+    }
+    
+    .alert-warning {
+      background-color: #fff3cd;
+      border: 1px solid #ffeaa7;
+      color: #856404;
+    }
+    
+    .price-info {
+      background-color: #e8f4fd;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin: 8px 0;
+      font-size: 14px;
+      border-left: 4px solid #007bff;
+    }
+    
+    .valuation-details {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    
+    .valuation-details p {
+      margin: 8px 0;
+    }
+    
+    #results {
+      display: none;
+    }
+    
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
+    .form-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+    }
+    
+    .form-section h3 {
+      margin-top: 0;
+      color: #333;
+      font-size: 16px;
+    }
+    
+    .input-group {
+      margin-bottom: 12px;
+    }
+    
+    .input-group label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 500;
+      color: #555;
+    }
+    
+    .input-group input, 
+    .input-group select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    
+    .input-group input:focus,
+    .input-group select:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+    
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 10px;
+    }
+    
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+    
+    .btn-primary:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Tasador Inmobiliario Lima & Callao</h1>
+      <p class="lead">
+        Obtén una estimación precisa del valor de tu propiedad basada en datos actualizados del mercado inmobiliario 2025.
+        Selecciona distrito, zona específica y características para calcular el valor estimado.
+      </p>
+      <div class="market-update">
+        <small><strong>Actualizado:</strong> Agosto 2025 | <strong>Fuentes:</strong> Urbania, Adondevivir | <strong>T.C.:</strong> S/ 3.75 por USD</small>
+      </div>
+    </header>
+
+    <main class="grid">
+      <!-- Formulario de entrada -->
+      <aside class="card">
+        <form id="calc">
+          <h2>📋 Datos del Inmueble</h2>
+          
+          <!-- Mensajes de error y advertencias -->
+          <div id="errors" style="display: none;"></div>
+          <div id="warnings" style="display: none;"></div>
+          
+          <!-- Ubicación -->
+          <div class="form-section">
+            <h3>🌍 Ubicación</h3>
+            
+            <div class="input-group">
+              <label for="distrito">Distrito *</label>
+              <select id="distrito" required>
+                <option value="">Seleccionar distrito...</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="zona">Zona específica *</label>
+              <select id="zona" required>
+                <option value="">Primero selecciona un distrito</option>
+              </select>
+            </div>
+            
+            <!-- Información de precio base -->
+            <div id="priceInfo"></div>
+          </div>
+
+          <!-- Tipo y características básicas -->
+          <div class="form-section">
+            <h3>🏠 Tipo y Características</h3>
+            
+            <div class="input-group">
+              <label for="tipo">Tipo de Propiedad *</label>
+              <select id="tipo" required>
+                <option value="Departamento">Departamento</option>
+                <option value="Casa">Casa</option>
+                <option value="Terreno">Terreno</option>
+              </select>
+            </div>
+
+            <div class="row">
+              <div class="input-group">
+                <label for="areaTechada">Área techada (m²) *</label>
+                <input id="areaTechada" type="number" value="75" min="20" max="2000" step="0.1" required>
+              </div>
+              <div class="input-group">
+                <label for="areaLibre">Área libre (m²)</label>
+                <input id="areaLibre" type="number" value="0" min="0" max="1000" step="0.1">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="input-group">
+                <label for="dorms">Dormitorios</label>
+                <input id="dorms" type="number" value="3" min="1" max="10">
+              </div>
+              <div class="input-group">
+                <label for="baths">Baños</label>
+                <input id="baths" type="number" value="2" min="1" max="8">
+              </div>
+            </div>
+          </div>
+
+          <!-- Características adicionales -->
+          <div class="form-section">
+            <h3>🏢 Características Adicionales</h3>
+            
+            <div class="row">
+              <div class="input-group">
+                <label for="piso">Piso</label>
+                <input id="piso" type="number" value="1" min="1" max="50">
+              </div>
+              <div class="input-group">
+                <label for="ascensor">Ascensor</label>
+                <select id="ascensor">
+                  <option value="sin">Sin ascensor</option>
+                  <option value="con">Con ascensor</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="input-group">
+                <label for="antiguedad">Antigüedad (años)</label>
+                <input id="antiguedad" type="number" value="10" min="0" max="100">
+              </div>
+              <div class="input-group">
+                <label for="currency">Moneda</label>
+                <select id="currency">
+                  <option value="PEN">S/ (Soles peruanos)</option>
+                  <option value="USD">USD (Dólares)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary cta">
+            💰 Calcular Valorización
+          </button>
+        </form>
+      </aside>
+
+      <!-- Resultados -->
+      <section class="card">
+        <div id="results">
+          <h2>📊 Resultado de Valorización</h2>
+          <div id="summary" class="muted">Completa el formulario para obtener la estimación...</div>
+          
+          <div class="kpi">
+            <div class="kpi-item">
+              <h3>💹 Valor Mínimo</h3>
+              <div id="valMin" class="kpi-value">—</div>
+            </div>
+            <div class="kpi-item">
+              <h3>🎯 Valor Estimado</h3>
+              <div id="valMed" class="kpi-value main-value">—</div>
+            </div>
+            <div class="kpi-item">
+              <h3>📈 Valor Máximo</h3>
+              <div id="valMax" class="kpi-value">—</div>
+            </div>
+          </div>
+          
+          <!-- Detalles adicionales -->
+          <div id="details"></div>
+        </div>
+
+        <!-- Estado inicial -->
+        <div id="initial-state">
+          <h2>🏘️ Valorización Inmobiliaria</h2>
+          <p class="muted">
+            Utiliza el formulario de la izquierda para calcular el valor estimado de tu propiedad.
+          </p>
+          <div class="features">
+            <h3>✨ Características de nuestro tasador:</h3>
+            <ul>
+              <li>📍 <strong>48 distritos</strong> de Lima y Callao</li>
+              <li>🏘️ <strong>336+ zonas específicas</strong> con precios reales</li>
+              <li>📊 Datos actualizados de <strong>Urbania y Adondevivir</strong></li>
+              <li>🔄 Algoritmo que considera <strong>depreciación, ubicación y características</strong></li>
+              <li>💱 Resultados en <strong>soles y dólares</strong></li>
+              <li>⚡ Validación automática y alertas inteligentes</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Información adicional -->
+    <footer>
+      <div class="disclaimer">
+        <h3>⚠️ Información Legal</h3>
+        <p>
+          <strong>Importante:</strong> Esta es una estimación referencial basada en datos de mercado actualizados a agosto 2025. 
+          Los valores reales pueden variar según condiciones específicas de la propiedad, estado de conservación, 
+          vista, orientación y otros factores no considerados en este cálculo automatizado.
+        </p>
+        <p>
+          Para una tasación oficial, consulta con un perito tasador certificado. 
+          Este calculador no reemplaza una evaluación profesional.
+        </p>
+      </div>
+      
+      <div class="credits">
+        <p>
+          <strong>Desarrollado por Cuneo</strong> | 
+          Fuentes: Urbania, Adondevivir | 
+          Actualización: Agosto 2025 |
+          Tipo de cambio: S/ 3.75 por USD
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts: Orden importante para compatibilidad -->
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+  
+  <script>
+    // Script adicional para mejorar la experiencia de usuario
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('calc');
+      const initialState = document.getElementById('initial-state');
+      const results = document.getElementById('results');
+      
+      // Ocultar estado inicial y mostrar resultados después del primer cálculo
+      form.addEventListener('submit', function() {
+        setTimeout(function() {
+          if (initialState && results) {
+            initialState.style.display = 'none';
+            results.style.display = 'block';
+          }
+        }, 100);
+      });
+      
+      // Limpiar mensajes al cambiar inputs
+      const inputs = form.querySelectorAll('input, select');
+      inputs.forEach(input => {
+        input.addEventListener('change', function() {
+          if (typeof clearMessages === 'function') {
+            clearMessages();
+          }
+        });
+      });
+      
+      // Tooltip para ayuda
+      const helpTexts = {
+        areaTechada: 'Área construida cubierta de la propiedad',
+        areaLibre: 'Patios, jardines, terrazas descubiertas',
+        antiguedad: '0 = Nueva construcción, 50+ = Muy antigua',
+        piso: 'Piso donde se ubica (1 = planta baja)'
+      };
+      
+      Object.entries(helpTexts).forEach(([id, text]) => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.title = text;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
